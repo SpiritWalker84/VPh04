@@ -1,0 +1,11 @@
+# Контекст сборки web-образа — корень репозитория; исключаем лишнее.
+.git
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+backend/.venv
+.env
+.env.*
+frontend/node_modules
+frontend/dist
+*.md

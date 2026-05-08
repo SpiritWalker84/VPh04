@@ -1,5 +1,6 @@
 # Запуск: docker compose up -d
-# Первый запуск с пересборкой приложений (когда появится backend): docker compose up -d --build
+# Пересборка всего стека: docker compose build && docker compose up -d
+# Образ nginx собирает фронтенд внутри себя (docker/web/Dockerfile); отдельно npm run build на хосте не обязателен.
 # Требуется Docker Compose v2 (плагин: docker compose), не устаревший бинарь docker-compose.
 
 name: vph04
@@ -41,36 +42,41 @@ services:
         condition: service_healthy
 
   nginx:
-    image: nginx:1.27-alpine
+    build:
+      context: .
+      dockerfile: docker/web/Dockerfile
+    image: vph04-web:latest
     container_name: vph04-nginx
     restart: unless-stopped
     ports:
       - "${NGINX_HTTP_PORT:-8080}:80"
-    volumes:
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./docker/nginx/html:/usr/share/nginx/html:ro
+    networks:
+      - internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+      backend:
+        condition: service_started
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vph04-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      SECRET_KEY: ${SECRET_KEY}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      DOCS_ENABLED: ${DOCS_ENABLED:-false}
     networks:
       - internal
     depends_on:
       postgres:
         condition: service_healthy
 
-  # Сервис приложения (backend). Раскомментируйте после добавления Dockerfile в ./backend
-  # и при необходимости поправьте образ, порт и переменные окружения.
-  #
-  # backend:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   container_name: vph04-backend
-  #   restart: unless-stopped
-  #   environment:
-  #     DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-  #   networks:
-  #     - internal
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
+  # Сервис приложения был здесь закомментирован — теперь используется блок `backend` выше.
 
 networks:
   internal:

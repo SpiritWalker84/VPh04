@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Админ — Autéllo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="admin-body">
+    <section id="loginPanel" class="login-panel" aria-labelledby="login-heading">
+      <div class="login-card">
+        <h1 id="login-heading">Служебный вход</h1>
+        <p class="login-lead">Каталог услуг после авторизации.</p>
+        <form id="loginForm" class="login-form">
+          <div>
+            <label class="field__label" for="loginUser">Логин</label>
+            <input id="loginUser" name="username" type="text" autocomplete="username" required />
+          </div>
+          <div>
+            <label class="field__label" for="loginPass">Пароль</label>
+            <input id="loginPass" name="password" type="password" autocomplete="current-password" required />
+          </div>
+          <button type="submit" class="btn-sm login-submit">Войти</button>
+        </form>
+        <p id="loginStatus" class="login-status" role="status" aria-live="polite"></p>
+        <a class="btn-sm login-home" href="/">На главную</a>
+      </div>
+    </section>
+
+    <div id="adminApp" class="admin-wrap" hidden>
+      <header class="admin-head">
+        <div>
+          <h1>Админ-каталог</h1>
+          <p>Услуги и диапазоны бюджета для клиентской формы.</p>
+        </div>
+        <div class="inline">
+          <button type="button" id="logoutBtn" class="btn-sm">Выйти</button>
+          <a class="btn-sm" href="/">На главную</a>
+        </div>
+      </header>
+
+      <section class="table-card" aria-label="Таблица услуг">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Услуга</th>
+              <th>Бюджет</th>
+              <th>Порядок</th>
+              <th>Статус</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="settingsBody">
+            <tr>
+              <td colspan="6">Загрузка…</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="admin-form" aria-labelledby="create-title">
+        <h2 id="create-title">Новая позиция</h2>
+        <form id="createForm" class="admin-grid">
+          <div>
+            <label class="field__label" for="c_title">Услуга</label>
+            <input id="c_title" type="text" required />
+          </div>
+          <div>
+            <label class="field__label" for="c_budget">Диапазон бюджета (строка)</label>
+            <input id="c_budget" type="text" required placeholder="100k–900k" />
+          </div>
+          <div>
+            <label class="field__label" for="c_order">Порядок сортировки</label>
+            <input id="c_order" type="number" value="0" />
+          </div>
+          <div class="inline" style="align-items: flex-end">
+            <label class="inline" style="gap: 0.5rem">
+              <input id="c_active" type="checkbox" checked />
+              Активна
+            </label>
+            <button type="submit" class="btn-sm" style="border-color: var(--accent); color: var(--accent)">
+              Добавить
+            </button>
+          </div>
+        </form>
+        <p id="adminStatus" class="admin-status" role="status" aria-live="polite"></p>
+      </section>
+    </div>
+
+    <script type="module" src="/src/admin-main.ts"></script>
+  </body>
+</html>

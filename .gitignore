@@ -1,2 +1,8 @@
 # Локальные секреты и окружение (см. docs/conventions/environment-and-secrets.md в Guide)
 .env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.python-version
