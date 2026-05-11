@@ -1,13 +1,13 @@
-"""Проверка учётных данных администратора (без отдельных криптобиблиотек)."""
+"""Хеширование паролей администраторов (bcrypt)."""
 
 from __future__ import annotations
 
-import hashlib
-import hmac
+import bcrypt
 
 
-def verify_password(given: str, expected: str) -> bool:
-    """Сравнение паролей устойчивым к таймингу образом через хэш фиксированной длины."""
-    g = hashlib.sha256(given.encode("utf-8")).digest()
-    e = hashlib.sha256(expected.encode("utf-8")).digest()
-    return hmac.compare_digest(g, e)
+def hash_password(plain: str) -> str:
+    return bcrypt.hashpw(plain.encode("utf-8"), bcrypt.gensalt(rounds=12)).decode("utf-8")
+
+
+def verify_password(plain: str, hashed: str) -> bool:
+    return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))

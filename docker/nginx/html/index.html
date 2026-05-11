@@ -12,6 +12,6 @@
 <body>
   <h1>Слой VPh04 (Nginx)</h1>
   <p>По умолчанию используется <strong>HTTP</strong>. Пути API предназначены для проксирования на backend по префиксу <code>/api/</code> после добавления сервиса в <code>docker-compose.yml</code>.</p>
-  <p>Администрирование БД — через pgAdmin (порт из <code>.env</code>, например <code>PGADMIN_PORT</code>).</p>
+  <p>Работа с PostgreSQL: из контейнера <code>docker compose exec postgres psql …</code> или временный проброс порта в compose (см. README).</p>
 </body>
 </html>

@@ -5,7 +5,7 @@ from __future__ import annotations
 from fastapi import APIRouter
 from starlette.responses import Response
 
-from app.api.deps import AdminServiceDep, AdminSessionDep
+from app.api.deps import AdminServiceDep, CurrentAdminDep
 from app.schemas.admin import AdminSettingCreate, AdminSettingRead, AdminSettingUpdate
 
 router = APIRouter(prefix="/admin/settings", tags=["admin-settings"])
@@ -19,7 +19,7 @@ async def list_active_settings(service: AdminServiceDep) -> list[AdminSettingRea
 
 @router.get("/all", response_model=list[AdminSettingRead])
 async def list_all_settings(
-    _: AdminSessionDep,
+    _: CurrentAdminDep,
     service: AdminServiceDep,
 ) -> list[AdminSettingRead]:
     """Полный список (включая неактивные) — только после входа в админку."""
@@ -29,7 +29,7 @@ async def list_all_settings(
 @router.post("", response_model=AdminSettingRead, status_code=201)
 async def create_setting(
     payload: AdminSettingCreate,
-    _: AdminSessionDep,
+    _: CurrentAdminDep,
     service: AdminServiceDep,
 ) -> AdminSettingRead:
     return await service.create(payload)
@@ -39,7 +39,7 @@ async def create_setting(
 async def update_setting(
     setting_id: int,
     payload: AdminSettingUpdate,
-    _: AdminSessionDep,
+    _: CurrentAdminDep,
     service: AdminServiceDep,
 ) -> AdminSettingRead:
     return await service.update(setting_id, payload)
@@ -48,7 +48,7 @@ async def update_setting(
 @router.delete("/{setting_id}", status_code=204)
 async def delete_setting(
     setting_id: int,
-    _: AdminSessionDep,
+    _: CurrentAdminDep,
     service: AdminServiceDep,
 ) -> Response:
     await service.delete(setting_id)

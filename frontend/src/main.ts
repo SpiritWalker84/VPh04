@@ -1,7 +1,32 @@
 import "./styles/app.css";
-import { apiPost, fetchAdminSettingsActive } from "./api";
+import { apiPost, fetchAdminSettingsActive, postBehaviorMetrics } from "./api";
 import { BehaviorCollector } from "./behavior";
 import type { AdminSetting, LeadApplicationCreate } from "./types";
+
+function initScrollReveals() {
+  const nodes = document.querySelectorAll<HTMLElement>(".reveal-scroll");
+  if (!nodes.length) return;
+
+  const markInView = (el: HTMLElement) => el.classList.add("is-in-view");
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    nodes.forEach((el) => markInView(el));
+    return;
+  }
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        markInView(entry.target as HTMLElement);
+        io.unobserve(entry.target);
+      }
+    },
+    { root: null, rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
+  );
+
+  nodes.forEach((el) => io.observe(el));
+}
 
 const BUDGET_LEVELS = [
   "до 100 000 ₽",
@@ -84,8 +109,27 @@ function onServiceChange() {
 }
 
 async function main() {
+  initScrollReveals();
+
   const collector = new BehaviorCollector();
   collector.start(document.body);
+  collector.startPeriodicFlush(async () => {
+    await postBehaviorMetrics({
+      application_id: 0,
+      time_on_page: collector.getElapsedSeconds(),
+      buttons_clicked: collector.getButtonsClickedJson(),
+      cursor_positions: collector.getLastCursorJson(),
+      return_frequency: collector.getReturnVisits(),
+    });
+  }, 1000);
+
+  globalThis.addEventListener(
+    "pagehide",
+    () => {
+      collector.stopPeriodicFlush();
+    },
+    { passive: true },
+  );
 
   const budgetRange = $<HTMLInputElement>("budgetRange");
   budgetRange.addEventListener("input", () => syncBudgetFromSlider(), { passive: true });

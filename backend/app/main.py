@@ -6,7 +6,6 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from fastapi import FastAPI
-from starlette.middleware.sessions import SessionMiddleware
 
 from app.api.v1.router import api_v1_router
 from app.config import get_settings
@@ -34,15 +33,6 @@ def create_app() -> FastAPI:
         kwargs["openapi_url"] = None
 
     application = FastAPI(**kwargs)
-    # Cookie-сессия для /admin: без HTTPS ставим https_only=False (см. README).
-    application.add_middleware(
-        SessionMiddleware,
-        secret_key=settings.secret_key,
-        session_cookie="vph04_admin",
-        max_age=14 * 24 * 60 * 60,
-        same_site="lax",
-        https_only=False,
-    )
     application.include_router(api_v1_router, prefix=settings.api_v1_prefix)
     return application
 

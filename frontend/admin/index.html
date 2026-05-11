@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
   </head>
@@ -16,7 +16,8 @@
       <div class="login-card">
         <h1 id="login-heading">Служебный вход</h1>
         <p class="login-lead">Каталог услуг после авторизации.</p>
-        <form id="loginForm" class="login-form">
+
+        <form id="loginForm" class="login-form" autocomplete="on">
           <div>
             <label class="field__label" for="loginUser">Логин</label>
             <input id="loginUser" name="username" type="text" autocomplete="username" required />
@@ -27,6 +28,24 @@
           </div>
           <button type="submit" class="btn-sm login-submit">Войти</button>
         </form>
+
+        <form id="registerForm" class="login-form" hidden autocomplete="on">
+          <p class="login-lead login-lead--tight">Первый администратор: задайте логин и пароль (не меньше 8 символов).</p>
+          <div>
+            <label class="field__label" for="registerUser">Логин</label>
+            <input id="registerUser" name="username" type="text" autocomplete="username" required />
+          </div>
+          <div>
+            <label class="field__label" for="registerPass">Пароль</label>
+            <input id="registerPass" name="password" type="password" autocomplete="new-password" required minlength="8" />
+          </div>
+          <button type="submit" class="btn-sm login-submit">Создать администратора</button>
+          <button type="button" class="btn-sm login-secondary" id="cancelRegisterBtn">Ко входу</button>
+        </form>
+
+        <p class="login-actions" id="loginActions">
+          <button type="button" class="login-link" id="toRegisterBtn" hidden>Зарегистрироваться</button>
+        </p>
         <p id="loginStatus" class="login-status" role="status" aria-live="polite"></p>
         <a class="btn-sm login-home" href="/">На главную</a>
       </div>
@@ -38,59 +57,211 @@
           <h1>Админ-каталог</h1>
           <p>Услуги и диапазоны бюджета для клиентской формы.</p>
         </div>
-        <div class="inline">
+        <div class="inline admin-head-actions">
+          <button type="button" id="navCatalogBtn" class="btn-sm admin-nav-btn is-active">Каталог услуг</button>
+          <button type="button" id="navLeadsBtn" class="btn-sm admin-nav-btn">Сводка заявок</button>
+          <button type="button" id="statsOpenBtn" class="btn-sm">Статистика пользователей</button>
           <button type="button" id="logoutBtn" class="btn-sm">Выйти</button>
           <a class="btn-sm" href="/">На главную</a>
         </div>
       </header>
 
-      <section class="table-card" aria-label="Таблица услуг">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Услуга</th>
-              <th>Бюджет</th>
-              <th>Порядок</th>
-              <th>Статус</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="settingsBody">
-            <tr>
-              <td colspan="6">Загрузка…</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+      <div id="adminPanelServices">
+        <section class="table-card" aria-label="Таблица услуг">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Услуга</th>
+                <th>Бюджет</th>
+                <th>Порядок</th>
+                <th>Статус</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="settingsBody">
+              <tr>
+                <td colspan="6">Загрузка…</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
 
-      <section class="admin-form" aria-labelledby="create-title">
-        <h2 id="create-title">Новая позиция</h2>
-        <form id="createForm" class="admin-grid">
-          <div>
-            <label class="field__label" for="c_title">Услуга</label>
-            <input id="c_title" type="text" required />
+        <section class="admin-form" aria-labelledby="create-title">
+          <h2 id="create-title">Новая позиция</h2>
+          <form id="createForm" class="admin-grid">
+            <div>
+              <label class="field__label" for="c_title">Услуга</label>
+              <input id="c_title" type="text" required />
+            </div>
+            <div>
+              <label class="field__label" for="c_budget">Диапазон бюджета (строка)</label>
+              <input id="c_budget" type="text" required placeholder="100k–900k" />
+            </div>
+            <div>
+              <label class="field__label" for="c_order">Порядок сортировки</label>
+              <input id="c_order" type="number" value="0" />
+            </div>
+            <div class="inline" style="align-items: flex-end">
+              <label class="inline" style="gap: 0.5rem">
+                <input id="c_active" type="checkbox" checked />
+                Активна
+              </label>
+              <button type="submit" class="btn-sm" style="border-color: var(--accent); color: var(--accent)">
+                Добавить
+              </button>
+            </div>
+          </form>
+          <p id="adminStatus" class="admin-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+
+      <div id="adminPanelLeads" hidden>
+        <section class="leads-dashboard" aria-labelledby="dashboard-heading">
+          <div class="leads-dashboard__head">
+            <h2 id="dashboard-heading" class="leads-dashboard__title">Сводка заявок</h2>
           </div>
-          <div>
-            <label class="field__label" for="c_budget">Диапазон бюджета (строка)</label>
-            <input id="c_budget" type="text" required placeholder="100k–900k" />
+          <div class="leads-dashboard__grid">
+            <article class="dash-card dash-card--primary">
+              <div class="dash-card__top">
+                <span class="dash-card__icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 12h-6l-2 3H10L8 12H2" />
+                    <path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z" />
+                  </svg>
+                </span>
+                <span class="dash-card__label">Всего заявок</span>
+              </div>
+              <span class="dash-card__value" id="dashTotal">—</span>
+            </article>
+            <article class="dash-card dash-card--week">
+              <div class="dash-card__top">
+                <span class="dash-card__icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <path d="M16 2v4M8 2v4M3 10h18" />
+                  </svg>
+                </span>
+                <span class="dash-card__label">Новых за 7 дней</span>
+              </div>
+              <span class="dash-card__value" id="dashWeek">—</span>
+            </article>
+            <article class="dash-card dash-card--hot">
+              <div class="dash-card__top">
+                <span class="dash-card__icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8.5 14.5A2.5 2.5 0 0012 17c1.38 0 2.5-1.12 2.5-2.5 0-1.2-.5-2.27-1.36-3M12 17c1.38 0 2.5-1.12 2.5-2.5 0-2-1-4-3-6.5-1 2-1.5 3.5-1.5 5" />
+                  </svg>
+                </span>
+                <span class="dash-card__label">Горячие</span>
+              </div>
+              <span class="dash-card__value" id="dashHot">—</span>
+            </article>
+            <article class="dash-card dash-card--warm">
+              <div class="dash-card__top">
+                <span class="dash-card__icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+                  </svg>
+                </span>
+                <span class="dash-card__label">Тёплые</span>
+              </div>
+              <span class="dash-card__value" id="dashWarm">—</span>
+            </article>
+            <article class="dash-card dash-card--cold">
+              <div class="dash-card__top">
+                <span class="dash-card__icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v20M2 12h20M4.5 4.5l15 15M19.5 4.5l-15 15" />
+                  </svg>
+                </span>
+                <span class="dash-card__label">Холодные</span>
+              </div>
+              <span class="dash-card__value" id="dashCold">—</span>
+            </article>
           </div>
-          <div>
-            <label class="field__label" for="c_order">Порядок сортировки</label>
-            <input id="c_order" type="number" value="0" />
+          <p class="leads-dashboard__meta" id="dashboardMeta" hidden></p>
+        </section>
+
+        <section class="table-card applications-section" aria-label="Заявки клиентов">
+          <div class="applications-head">
+            <div>
+              <h2 class="applications-title">Заявки клиентов</h2>
+              <p class="applications-lead">
+                Очередь по данным из таблицы заявок (до 500 последних): в списке столько строк, сколько записей в базе. Горячие выше при сортировке «По приоритету». В карточке — поля заявки и контакты.
+              </p>
+            </div>
+            <div class="inline applications-toolbar">
+              <button type="button" id="applicationsSortPriority" class="btn-sm applications-sort is-active">
+                По приоритету
+              </button>
+              <button type="button" id="applicationsSortRecent" class="btn-sm applications-sort">По дате</button>
+              <button type="button" id="applicationsRefresh" class="btn-sm">Обновить</button>
+            </div>
           </div>
-          <div class="inline" style="align-items: flex-end">
-            <label class="inline" style="gap: 0.5rem">
-              <input id="c_active" type="checkbox" checked />
-              Активна
-            </label>
-            <button type="submit" class="btn-sm" style="border-color: var(--accent); color: var(--accent)">
-              Добавить
-            </button>
+          <table class="applications-table">
+            <thead>
+              <tr>
+                <th>Балл</th>
+                <th>Температура</th>
+                <th>Клиент</th>
+                <th>Ниша</th>
+                <th>Размер</th>
+                <th>Бюджет</th>
+                <th>Отдел</th>
+                <th>Менеджер</th>
+                <th>Связь</th>
+                <th>Создана</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="applicationsBody">
+              <tr>
+                <td colspan="11">Откройте раздел или нажмите «Обновить».</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+    </div>
+
+    <div id="applicationModal" class="app-detail-modal" hidden aria-modal="true" role="dialog" aria-labelledby="applicationModalTitle">
+      <div class="app-detail-modal__backdrop" id="applicationModalBackdrop"></div>
+      <div class="app-detail-modal__panel">
+        <header class="app-detail-modal__head">
+          <h2 id="applicationModalTitle">Заявка</h2>
+          <button type="button" class="app-detail-modal__close" id="applicationModalClose" aria-label="Закрыть">
+            ×
+          </button>
+        </header>
+        <div id="applicationModalBody" class="app-detail-modal__body"></div>
+      </div>
+    </div>
+
+    <div id="statsModal" class="stats-modal" hidden aria-modal="true" role="dialog" aria-labelledby="statsModalTitle">
+      <div class="stats-modal__backdrop" id="statsModalBackdrop"></div>
+      <div class="stats-modal__panel">
+        <header class="stats-modal__head">
+          <h2 id="statsModalTitle">Статистика лендинга</h2>
+          <button type="button" class="stats-modal__close" id="statsModalClose" aria-label="Закрыть">
+            ×
+          </button>
+        </header>
+        <div class="stats-modal__body">
+          <p class="stats-modal__lead">
+            Среднее «дневного максимума» времени на странице (по дням UTC) и хитмап позиций курсора за 30 дней.
+          </p>
+          <p id="statsEmptyHint" class="stats-modal__hint" hidden></p>
+          <ul class="stats-modal__summary" id="statsSummary"></ul>
+          <div class="stats-heatmap-wrap" id="statsHeatmapWrap">
+            <p id="statsHeatmapEmpty" class="stats-heatmap-empty" hidden>
+              Нет координат курсора для карты: зайдите на главную страницу сайта (не админку), подвигайте мышью 10–20 секунд.
+            </p>
+            <svg id="statsHeatmapSvg" class="stats-heatmap-svg" aria-hidden="true"></svg>
           </div>
-        </form>
-        <p id="adminStatus" class="admin-status" role="status" aria-live="polite"></p>
-      </section>
+        </div>
+      </div>
     </div>
 
     <script type="module" src="/src/admin-main.ts"></script>

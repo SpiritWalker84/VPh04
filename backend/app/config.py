@@ -19,9 +19,8 @@ class Settings(BaseSettings):
 
     # Подпись cookie-сессии (Starlette SessionMiddleware). Минимум 32 байта в UTF-8.
     secret_key: str = Field(min_length=32)
-    # Админ-панель: логин и пароль (plain, только в контуре сервера; без HTTPS — см. README).
-    admin_username: str = "admin"
-    admin_password: str = Field(min_length=8)
+    jwt_algorithm: str = "HS256"
+    jwt_access_token_expire_minutes: int = 60 * 24 * 14
 
     docs_enabled: bool = False
 

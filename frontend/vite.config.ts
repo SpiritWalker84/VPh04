@@ -22,6 +22,8 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    /** Слушать все интерфейсы: надёжнее для WSL/Docker-desktop и открытия с другой машины в LAN. */
+    host: true,
     proxy: {
       "/api": {
         target: "http://127.0.0.1:8080",

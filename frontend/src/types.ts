@@ -39,8 +39,64 @@ export type LeadApplicationCreate = {
   behavior?: BehaviorMetricsCreate | null;
 };
 
+export type BehaviorMetricsRead = {
+  application_id: number;
+  time_on_page_seconds?: number | null;
+  return_visits: number;
+  button_events?: Record<string, unknown> | unknown[] | null;
+  cursor_metrics?: Record<string, unknown> | unknown[] | null;
+  raw_payload?: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type LeadApplicationRead = LeadApplicationCreate & {
   id: number;
   created_at: string;
   updated_at: string;
+  behavior?: BehaviorMetricsRead | null;
+};
+
+export type LeadScoringInsight = {
+  priority_score: number;
+  temperature: "hot" | "warm" | "cold";
+  temperature_label: string;
+  summary: string;
+  recommended_department: string;
+  personal_manager_recommended: boolean;
+  worth_pursuing: boolean;
+  reasons: string[];
+};
+
+export type LeadApplicationAdminListItem = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  middle_name: string | null;
+  budget_label: string | null;
+  business_niche: string | null;
+  company_size: string | null;
+  role_type: string | null;
+  result_deadline: string | null;
+  product_interest: string | null;
+  preferred_contact_method: string | null;
+  created_at: string;
+  scoring: LeadScoringInsight;
+};
+
+export type LeadApplicationAdminDetail = LeadApplicationRead & {
+  scoring: LeadScoringInsight;
+};
+
+export type ApplicationDashboardResponse = {
+  applications_total: number;
+  scored_for_breakdown: number;
+  scoring_capped: boolean;
+  hot_count: number;
+  warm_count: number;
+  cold_count: number;
+  avg_priority_score: number;
+  personal_manager_recommended_count: number;
+  worth_pursuing_count: number;
+  new_last_7_days: number;
 };

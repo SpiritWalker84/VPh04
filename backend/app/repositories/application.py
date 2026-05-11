@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from sqlalchemy import select
+from datetime import datetime
+
+from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -60,9 +62,30 @@ class ApplicationRepository:
     async def list_page(self, *, limit: int = 50, offset: int = 0) -> list[LeadApplication]:
         stmt = (
             select(LeadApplication)
-            .order_by(LeadApplication.created_at.desc())
-            .limit(min(limit, 200))
+            .order_by(desc(LeadApplication.created_at))
+            .limit(min(limit, 500))
             .offset(offset)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def count_all(self) -> int:
+        stmt = select(func.count()).select_from(LeadApplication)
+        res = await self._session.execute(stmt)
+        return int(res.scalar_one() or 0)
+
+    async def count_created_since(self, since: datetime) -> int:
+        stmt = select(func.count()).select_from(LeadApplication).where(LeadApplication.created_at >= since)
+        res = await self._session.execute(stmt)
+        return int(res.scalar_one() or 0)
+
+    async def list_recent_for_dashboard(self, limit: int) -> list[LeadApplication]:
+        if limit <= 0:
+            return []
+        stmt = (
+            select(LeadApplication)
+            .order_by(desc(LeadApplication.created_at))
+            .limit(min(limit, 5000))
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())

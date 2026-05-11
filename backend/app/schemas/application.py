@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -88,3 +88,55 @@ class LeadApplicationList(BaseModel):
     first_name: str
     last_name: str
     created_at: datetime
+
+
+class LeadScoringInsight(BaseModel):
+    """Эвристическая оценка приоритета (для админки)."""
+
+    priority_score: Annotated[int, Field(ge=0, le=100)]
+    temperature: Literal["hot", "warm", "cold"]
+    temperature_label: str
+    summary: str
+    recommended_department: str
+    personal_manager_recommended: bool
+    worth_pursuing: bool
+    reasons: list[str] = Field(default_factory=list)
+
+
+class LeadApplicationAdminListItem(BaseModel):
+    """Строка списка заявок с приоритетом."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    first_name: str
+    last_name: str
+    middle_name: str | None
+    budget_label: str | None
+    business_niche: str | None
+    company_size: str | None
+    role_type: str | None
+    result_deadline: str | None
+    product_interest: str | None
+    preferred_contact_method: str | None
+    created_at: datetime
+    scoring: LeadScoringInsight
+
+
+class LeadApplicationAdminDetail(LeadApplicationRead):
+    scoring: LeadScoringInsight
+
+
+class ApplicationDashboardResponse(BaseModel):
+    """Сводка по заявкам для дашборда админки."""
+
+    applications_total: int
+    scored_for_breakdown: int
+    scoring_capped: bool
+    hot_count: int
+    warm_count: int
+    cold_count: int
+    avg_priority_score: float = Field(description="Средний балл приоритета по заявкам из разбивки")
+    personal_manager_recommended_count: int
+    worth_pursuing_count: int
+    new_last_7_days: int = Field(description="Заявок за последние 7 суток (UTC)")
